@@ -1,0 +1,24 @@
+{
+    "name": "@wonderlandengine/wle-cli",
+    "description": "Command line interface for Wonderland Engine",
+    "license": "MIT",
+    "author": "Wonderland GmbH, Timmy Kokke",
+    "version": "0.1.0",
+    "main": "index.cjs",
+    "bin": {
+        "wonderland-editor": "./index.cjs"
+    },
+    "keywords": [
+        "webxr",
+        "wonderland",
+        "components"
+    ],
+    "scripts": {
+        "build": "node index.cjs"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "yargs": "^17.7.2"
+    },
+    "type": "module"
+}
