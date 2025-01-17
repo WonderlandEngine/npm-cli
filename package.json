@@ -3,7 +3,7 @@
     "description": "Command line interface to run Wonderland Editor from npm or build scripts.",
     "license": "MIT",
     "author": "Wonderland GmbH, Timmy Kokke",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "main": "index.cjs",
     "bin": {
         "wonderland-editor": "./index.cjs"
