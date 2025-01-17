@@ -54,8 +54,10 @@ async function findWonderlandEditorPath() {
         // Search for the executable in common directories and path variables
         const resolvedPath = await findExecutable(directoriesToSearch);
         if (!resolvedPath) {
-            console.error(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
-            process.exit(1);
+            console.log(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
+            if (require.main === module) {
+                process.exit(1);
+            }
         }
         return resolvedPath;
 
@@ -68,33 +70,28 @@ async function findWonderlandEditorPath() {
  * For more information and a list of all arguments visit https://wonderlandengine.com/editor/commands
  * @param {readonly string[]} args Wonderland Editor Arguments. The arguments are passed directly to the editor.
   */
-function runWonderlandEditor(args) {
-    return new Promise(async (resolve, reject) => {
-        let WonderlandEditorPath = null;
-        try {
-            WonderlandEditorPath = await findWonderlandEditorPath();
-        } catch (err) {
-            // Error finding the editor path
-            console.error('Error finding the editor path', err);
-            reject(err);
-        }
-
+async function runWonderlandEditor(args) {
+    try {
+        const WonderlandEditorPath = await findWonderlandEditorPath();
         const process = spawn(WonderlandEditorPath, args, { stdio: 'inherit' });
 
         process.on('close', (code) => {
-            if (code === 0) {
-                resolve();
-            } else {
-                reject(new Error(`Process exited with code ${code}`));
+            if (code !== 0) {
+                const err = `Process exited with code ${code}`;
+                throw new Error(err, {
+                    cause: 'Wonderland Editor execution failed, check log for more info.'
+                });
             }
         });
 
         process.on('error', (err) => {
-            console.error('Error launching Wonderland Editor', err);
-            reject(err);
-
+            throw err;
         });
-    });
+
+    } catch (err) {
+        console.error('Error finding the editor path', err);
+        throw err;
+    }
 
 }
 
