@@ -1,6 +1,10 @@
-# wonderland-editor
+# wonderland-editor CLI
 
-A command-line interface for building Wonderland Engine projects.
+A command-line interface for building Wonderland Engine projects through the installed editor.
+
+## Prerequisites
+
+You need to have Wonderland Engine installed on your system. To learn more, and download Wonderland Engine, head over to <https://wonderlandengine.com/>.
 
 ## Installation
 
