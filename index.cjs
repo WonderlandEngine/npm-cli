@@ -5,88 +5,111 @@ const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 const yargs = require('yargs');
-const { hideBin } = require('yargs/helpers')
+const { hideBin } = require('yargs/helpers');
+const which = require('which');
 
-// Load environment variables from .env file
 dotenv.config();
 
 let WonderlandEditorPath = process.env.WONDERLAND_EDITOR_PATH || null;
 
-// Define common search paths
 const searchPaths = {
     win32: ['C:\\Program Files\\Wonderland\\WonderlandEngine\\bin', 'C:\\Program Files (x86)\\Wonderland\\WonderlandEngine\\bin'],
     darwin: ['/Applications/Wonderland', '/usr/local/bin', '/usr/bin'],
     linux: ['/usr/local/bin/Wonderland', '/usr/bin/Wonderland', '/bin/Wonderland']
 };
 
-// Get the executable name and search paths based on the platform
 const platform = process.platform;
 const executableName = platform === 'win32' ? 'WonderlandEditor.exe' : 'WonderlandEditor';
 const directoriesToSearch = searchPaths[platform] || ['/'];
 
-// Function to find the executable
-const findExecutable = (directories, callback) => {
+/**
+ * Tries to find the Wonderland Editor executable 
+ */
+async function findExecutable(directories) {
+    const execPath = await which(executableName, { nothrow: true });
+    if (execPath) {
+        return execPath;
+    }
+
     for (const dir of directories) {
         const exePath = path.join(dir, executableName);
         if (fs.existsSync(exePath)) {
-            return callback(exePath);
+            return exePath;
         }
     }
-    return callback(null);
+    return null;
 };
 
-// Function to build the project file
+
+/**
+ * Function to find the WonderlandEditor path
+ * @returns the path to the editor executable
+ */
+async function findWonderlandEditorPath() {
+    // Check if the path is already set though the environment variable
+    if (WonderlandEditorPath && fs.existsSync(WonderlandEditorPath)) {
+        WonderlandEditorPath = path.join(WonderlandEditorPath, executableName);
+        return WonderlandEditorPath;
+    } else {
+        // Search for the executable in common directories and path variables
+        const resolvedPath = await findExecutable(directoriesToSearch);
+        if (!resolvedPath) {
+            console.error(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
+            process.exit(1);
+        }
+        return resolvedPath;
+
+    }
+}
+
+/**
+ * Tries to find the Wonderland Editor path and runs the editor with the given arguments.
+ * 
+ * For more information and a list of all arguments visit https://wonderlandengine.com/editor/commands
+ * @param {readonly string[]} args Wonderland Editor Arguments. The arguments are passed directly to the editor.
+  */
 function runWonderlandEditor(args) {
-    return new Promise((resolve, reject) => {
-        findWonderlandEditorPath((WonderlandEditorPath) => {
-            const process = spawn(WonderlandEditorPath, args, { stdio: 'inherit' });
+    return new Promise(async (resolve, reject) => {
+        let WonderlandEditorPath = null;
+        try {
+            WonderlandEditorPath = await findWonderlandEditorPath();
+        } catch (err) {
+            // Error finding the editor path
+            console.error('Error finding the editor path', err);
+            reject(err);
+        }
 
-            process.on('close', (code) => {
-                if (code === 0) {
-                    resolve();
-                } else {
-                    reject(new Error(`Process exited with code ${code}`));
-                }
-            });
+        const process = spawn(WonderlandEditorPath, args, { stdio: 'inherit' });
 
-            process.on('error', (err) => {
-                console.error('Error launching Wonderland Editor', err);
-                reject(err);
+        process.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(new Error(`Process exited with code ${code}`));
+            }
+        });
 
-            });
+        process.on('error', (err) => {
+            console.error('Error launching Wonderland Editor', err);
+            reject(err);
+
         });
     });
 
 }
 
-// Function to find and set the WonderlandEditor path
-function findWonderlandEditorPath(callback) {
-    if (WonderlandEditorPath && fs.existsSync(WonderlandEditorPath)) {
-        WonderlandEditorPath = path.join(WonderlandEditorPath, executableName);
-        callback(WonderlandEditorPath);
-    } else {
-        findExecutable(directoriesToSearch, (resolvedPath) => {
-            if (!resolvedPath) {
-                console.error(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
-                process.exit(1);
-            }
-
-            console.log(`Found ${executableName} at: ${resolvedPath}`);
-            callback(resolvedPath);
-        });
-    }
-}
 // Command-line interface
 if (require.main === module) {
     const argv = yargs(hideBin(process.argv))
-        .usage('Usage: $0 [wonderland-args...]')
-        .help('h')
+        .scriptName('wonderland-editor')
+        .usage('Usage: $0 [wonderland-editor-arguments...]')
+        .example('$0 --package --windowless --project YourAwsomeProject.wlp', 'Package your project without opening the editor')
+        .epilogue('For more information and a list of all arguments visit https://wonderlandengine.com/editor/commands')
         .alias('h', 'help')
+        .help()
         .argv;
 
-    console.log(argv._);
-
-    runWonderlandEditor(argv).catch((err) => {
+    runWonderlandEditor(hideBin(process.argv)).catch((err) => {
         console.error('Build failed:', err);
     });
 }

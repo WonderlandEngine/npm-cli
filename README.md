@@ -9,13 +9,13 @@ Install the CLI tool globally or locally using npm:
 ### Global Installation
 
 ```bash
-npm install -g @wonderlandengine/wle-cli
+npm install -g @wonderlandengine/cli
 ```
 
 ### Local Installation
 
 ```bash
-npm install --save-dev @wonderlandengine/wle-cli
+npm install --save-dev @wonderlandengine/cli
 ```
 
 ## Usage
