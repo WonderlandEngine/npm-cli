@@ -49,13 +49,14 @@ WONDERLAND_EDITOR_PATH=/path/to/WonderlandEditor
 You can also use `wonderland-editor` programmatically in your Node.js scripts:
 
 ```javascript
-const { runWonderlandEditor } = require('wonderland-editor');
+import { runWonderlandEditor } from '@wonderlandengine/cli';
 
-const args = ['--package', '--windowless', '--project', 'YourAwesomeProject.wlp'];
+try {
+    await runWonderlandEditor(['--package', '--windowless', '--project', 'YourAwesomeProject.wlp']);
+} catch (e) {
+    console.error('Error during build', e);
+}
 
-runWonderlandEditor(args).catch((err) => {
-  console.error('Build failed:', err);
-});
 ```
 
 ## Project Structure
@@ -66,7 +67,8 @@ The following functions and variables are used in the CLI:
 
 ## Common Search Paths
 
-The CLI searches for the Wonderland Editor executable in the following common paths based on the platform:
+The CLI searches for the Wonderland Editor executable in using the PATH
+environment variable and common locations in the following common paths based on the platform:
 
 - **Windows**:
   - `C:\\Program Files\\Wonderland\\WonderlandEngine\\bin`
@@ -85,7 +87,3 @@ If the executable is not found in these paths and the `WONDERLAND_EDITOR_PATH` e
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-```
-
-This updated README reflects the changes to the tool name and the way arguments are passed directly to the Wonderland Editor executable for full flexibility.
