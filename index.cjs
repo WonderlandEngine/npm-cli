@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const { spawn } = require('child_process');
-const path = require('path');
+const { join } = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 const yargs = require('yargs');
@@ -10,20 +10,21 @@ const which = require('which');
 
 dotenv.config();
 
-let WonderlandEditorPath = process.env.WONDERLAND_EDITOR_PATH || null;
-
 const searchPaths = {
     win32: ['C:\\Program Files\\Wonderland\\WonderlandEngine\\bin', 'C:\\Program Files (x86)\\Wonderland\\WonderlandEngine\\bin'],
-    darwin: ['/Applications/Wonderland', '/usr/local/bin', '/usr/bin'],
+    darwin: ['/Applications', '/usr/local/bin', '/usr/bin'],
     linux: ['/usr/local/bin/Wonderland', '/usr/bin/Wonderland', '/bin/Wonderland']
 };
 
-const platform = process.platform;
-const executableName = platform === 'win32' ? 'WonderlandEditor.exe' : 'WonderlandEditor';
-const directoriesToSearch = searchPaths[platform] || ['/'];
+let executableName = 'WonderlandEditor';
+switch(process.platform) {
+    case 'win32': executableName += '.exe'; break;
+    case 'darwin': executableName += '.app'; break;
+}
+const directoriesToSearch = searchPaths[process.platform] ?? ['/'];
 
 /**
- * Tries to find the Wonderland Editor executable 
+ * Tries to find the Wonderland Editor executable.
  */
 async function findExecutable(directories) {
     const execPath = await which(executableName, { nothrow: true });
@@ -32,7 +33,7 @@ async function findExecutable(directories) {
     }
 
     for (const dir of directories) {
-        const exePath = path.join(dir, executableName);
+        const exePath = join(dir, executableName);
         if (fs.existsSync(exePath)) {
             return exePath;
         }
@@ -46,34 +47,39 @@ async function findExecutable(directories) {
  * @returns the path to the editor executable
  */
 async function findWonderlandEditorPath() {
-    // Check if the path is already set though the environment variable
-    if (WonderlandEditorPath && fs.existsSync(WonderlandEditorPath)) {
-        WonderlandEditorPath = path.join(WonderlandEditorPath, executableName);
-        return WonderlandEditorPath;
+    let path = process.env.WONDERLAND_EDITOR_PATH;
+    if (path && fs.existsSync(path)) {
+        path = join(path, executableName);
     } else {
         // Search for the executable in common directories and path variables
-        const resolvedPath = await findExecutable(directoriesToSearch);
-        if (!resolvedPath) {
-            console.log(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
-            if (require.main === module) {
-                process.exit(1);
-            }
-        }
-        return resolvedPath;
-
+        path = await findExecutable(directoriesToSearch);
     }
+
+    console.log(path);
+    if (!path) {
+        console.log(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
+        if (require.main === module) {
+            process.exit(1);
+        }
+    }
+
+    if (process.platform === 'darwin' && path.endsWith('.app')) {
+        path = join(path, 'Contents/MacOS/WonderlandEditor');
+    }
+
+    return path;
 }
 
 /**
  * Tries to find the Wonderland Editor path and runs the editor with the given arguments.
- * 
+ *
  * For more information and a list of all arguments visit https://wonderlandengine.com/editor/commands
  * @param {readonly string[]} args Wonderland Editor Arguments. The arguments are passed directly to the editor.
   */
 async function runWonderlandEditor(args) {
     try {
-        const WonderlandEditorPath = await findWonderlandEditorPath();
-        const process = spawn(WonderlandEditorPath, args, { stdio: 'inherit' });
+        const path = await findWonderlandEditorPath();
+        const process = spawn(path, args, { stdio: 'inherit' });
 
         process.on('close', (code) => {
             if (code !== 0) {
