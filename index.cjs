@@ -4,8 +4,7 @@ const { spawn } = require('child_process');
 const { join } = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
-const yargs = require('yargs');
-const { hideBin } = require('yargs/helpers');
+const { parseArgs } = require('node:util');
 const which = require('which');
 
 dotenv.config();
@@ -103,17 +102,32 @@ async function runWonderlandEditor(args) {
 
 // Command-line interface
 if (require.main === module) {
-    const argv = yargs(hideBin(process.argv))
-        .scriptName('wonderland-editor')
-        .usage('Usage: $0 [wonderland-editor-arguments...]')
-        .example('$0 --package --windowless --project YourAwsomeProject.wlp', 'Package your project without opening the editor')
-        .epilogue('For more information and a list of all arguments visit https://wonderlandengine.com/editor/commands')
-        .alias('h', 'help')
-        .help()
-        .argv;
+    // Minimal built-in args handling with Node >= 18
+    const parsed = parseArgs({
+        options: {
+            help: { type: 'boolean', short: 'h' }
+        },
+        allowPositionals: true,
+        args: process.argv.slice(2)
+    });
 
-    runWonderlandEditor(hideBin(process.argv)).catch((err) => {
+    if (parsed.values.help) {
+        const usage = [
+            'wonderland-editor [wonderland-editor-arguments...]',
+            '',
+            'Examples:',
+            '  wonderland-editor --package --windowless --project YourAwsomeProject.wlp',
+            '',
+            'For more information and a list of all arguments visit https://wonderlandengine.com/editor/commands'
+        ].join('\n');
+        console.log(usage);
+        process.exit(0);
+    }
+
+    const rawArgs = process.argv.slice(2);
+    runWonderlandEditor(rawArgs).catch((err) => {
         console.error('Build failed:', err);
+        process.exitCode = 1;
     });
 }
 

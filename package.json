@@ -2,8 +2,8 @@
     "name": "@wonderlandengine/cli",
     "description": "Command line interface to run Wonderland Editor from npm or build scripts.",
     "license": "MIT",
-    "author": "Wonderland GmbH, Timmy Kokke",
-    "version": "0.1.2",
+    "author": "Create Worlds (Robot Invader, Inc.), Timmy Kokke",
+    "version": "0.1.3",
     "main": "index.cjs",
     "bin": {
         "wonderland-editor": "./index.cjs"
@@ -18,8 +18,10 @@
     },
     "dependencies": {
         "dotenv": "^16.4.7",
-        "which": "^5.0.0",
-        "yargs": "^17.7.2"
+        "which": "^5.0.0"
+    },
+    "engines": {
+        "node": ">=18"
     },
     "type": "module"
 }

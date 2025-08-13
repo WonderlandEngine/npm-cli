@@ -6,6 +6,8 @@ A command-line interface for building Wonderland Engine projects through the ins
 
 You need to have Wonderland Engine installed on your system. To learn more, and download Wonderland Engine, head over to <https://wonderlandengine.com/>.
 
+Requires Node.js 18 or newer (uses the built-in util.parseArgs for CLI parsing).
+
 ## Installation
 
 Install the CLI tool globally or locally using npm:
