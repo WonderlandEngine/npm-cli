@@ -16,6 +16,11 @@
     "scripts": {
         "build": "node index.cjs"
     },
+    "prettier": "@wonderlandengine/prettier-config",
+    "devDependencies": {
+        "@wonderlandengine/prettier-config": "^1.0.0",
+        "prettier": "^3.3.3"
+    },
     "dependencies": {
         "dotenv": "^16.4.7",
         "which": "^5.0.0"

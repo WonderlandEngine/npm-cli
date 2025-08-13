@@ -10,15 +10,22 @@ const which = require('which');
 dotenv.config();
 
 const searchPaths = {
-    win32: ['C:\\Program Files\\Wonderland\\WonderlandEngine\\bin', 'C:\\Program Files (x86)\\Wonderland\\WonderlandEngine\\bin'],
+    win32: [
+'C:\\Program Files\\Wonderland\\WonderlandEngine\\bin',
+'C:\\Program Files (x86)\\Wonderland\\WonderlandEngine\\bin',
+],
     darwin: ['/Applications', '/usr/local/bin', '/usr/bin'],
-    linux: ['/usr/local/bin/Wonderland', '/usr/bin/Wonderland', '/bin/Wonderland']
+    linux: ['/usr/local/bin/Wonderland', '/usr/bin/Wonderland', '/bin/Wonderland'],
 };
 
 let executableName = 'WonderlandEditor';
-switch(process.platform) {
-    case 'win32': executableName += '.exe'; break;
-    case 'darwin': executableName += '.app'; break;
+switch (process.platform) {
+    case 'win32':
+executableName += '.exe';
+break;
+    case 'darwin':
+executableName += '.app';
+break;
 }
 const directoriesToSearch = searchPaths[process.platform] ?? ['/'];
 
@@ -38,8 +45,7 @@ async function findExecutable(directories) {
         }
     }
     return null;
-};
-
+}
 
 /**
  * Function to find the WonderlandEditor path
@@ -56,7 +62,9 @@ async function findWonderlandEditorPath() {
 
     console.log(path);
     if (!path) {
-        console.log(`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`);
+        console.log(
+`Error: ${executableName} not found. Please add a .env file with the path to WonderlandEditor.`
+);
         if (require.main === module) {
             process.exit(1);
         }
@@ -78,13 +86,13 @@ async function findWonderlandEditorPath() {
 async function runWonderlandEditor(args) {
     try {
         const path = await findWonderlandEditorPath();
-        const process = spawn(path, args, { stdio: 'inherit' });
+        const process = spawn(path, args, {stdio: 'inherit'});
 
         process.on('close', (code) => {
             if (code !== 0) {
                 const err = `Process exited with code ${code}`;
                 throw new Error(err, {
-                    cause: 'Wonderland Editor execution failed, check log for more info.'
+                    cause: 'Wonderland Editor execution failed, check log for more info.',
                 });
             }
         });

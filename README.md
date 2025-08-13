@@ -55,14 +55,18 @@ WONDERLAND_EDITOR_PATH=/path/to/WonderlandEditor
 You can also use `wonderland-editor` programmatically in your Node.js scripts:
 
 ```javascript
-import { runWonderlandEditor } from '@wonderlandengine/cli';
+import {runWonderlandEditor} from '@wonderlandengine/cli';
 
 try {
-    await runWonderlandEditor(['--package', '--windowless', '--project', 'YourAwesomeProject.wlp']);
+    await runWonderlandEditor([
+        '--package',
+        '--windowless',
+        '--project',
+        'YourAwesomeProject.wlp',
+    ]);
 } catch (e) {
     console.error('Error during build', e);
 }
-
 ```
 
 ## Project Structure
@@ -77,16 +81,16 @@ The CLI searches for the Wonderland Editor executable in using the PATH
 environment variable and common locations in the following common paths based on the platform:
 
 - **Windows**:
-  - `C:\\Program Files\\Wonderland\\WonderlandEngine\\bin`
-  - `C:\\Program Files (x86)\\Wonderland\\WonderlandEngine\\bin`
+    - `C:\\Program Files\\Wonderland\\WonderlandEngine\\bin`
+    - `C:\\Program Files (x86)\\Wonderland\\WonderlandEngine\\bin`
 - **macOS**:
-  - `/Applications/Wonderland`
-  - `/usr/local/bin`
-  - `/usr/bin`
+    - `/Applications/Wonderland`
+    - `/usr/local/bin`
+    - `/usr/bin`
 - **Linux**:
-  - `/usr/local/bin/Wonderland`
-  - `/usr/bin/Wonderland`
-  - `/bin/Wonderland`
+    - `/usr/local/bin/Wonderland`
+    - `/usr/bin/Wonderland`
+    - `/bin/Wonderland`
 
 If the executable is not found in these paths and the `WONDERLAND_EDITOR_PATH` environment variable is not set, the CLI will prompt you to add a `.env` file with the path to the Wonderland Editor.
 
