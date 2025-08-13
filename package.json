@@ -3,7 +3,7 @@
     "description": "Command line interface to run Wonderland Editor from npm or build scripts.",
     "license": "MIT",
     "author": "Create Worlds (Robot Invader, Inc.), Timmy Kokke",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "main": "index.cjs",
     "bin": {
         "wonderland-editor": "index.cjs"
