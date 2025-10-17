@@ -112,7 +112,6 @@ if (require.main === module) {
         try {
             await runWonderlandEditor(rawArgs);
             // successful exit
-            process.exitCode = 0;
             // explicitly exit to ensure Node terminates immediately
             process.exit(0);
         } catch (err) {
