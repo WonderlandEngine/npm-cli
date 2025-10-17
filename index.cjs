@@ -83,36 +83,36 @@ async function findWonderlandEditorPath() {
  * @param {readonly string[]} args Wonderland Editor Arguments. The arguments are passed directly to the editor.
  */
 async function runWonderlandEditor(args) {
-    try {
-        const path = await findWonderlandEditorPath();
-        const process = spawn(path, args, {stdio: 'inherit'});
+    const editorPath = await findWonderlandEditorPath();
+    return new Promise((resolve, reject) => {
+        const child = spawn(editorPath, args, {stdio: 'inherit'});
 
-        process.on('close', (code) => {
-            if (code !== 0) {
-                const err = `Process exited with code ${code}`;
-                throw new Error(err, {
-                    cause: 'Wonderland Editor execution failed, check log for more info.',
-                });
+        child.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                const err = new Error(`Process exited with code ${code}`);
+                // provide the exit code on the error for callers
+                err.code = code;
+                reject(err);
             }
         });
 
-        process.on('error', (err) => {
-            throw err;
+        child.on('error', (err) => {
+            reject(err);
         });
-    } catch (err) {
-        console.error('Error finding the editor path', err);
-        throw err;
-    }
+    });
 }
 
-// Command-line interface
 if (require.main === module) {
-    // Forward all arguments as-is; Wonderland Editor handles parsing
-    const rawArgs = process.argv.slice(2);
-    runWonderlandEditor(rawArgs).catch((err) => {
-        console.error('Build failed:', err);
-        process.exitCode = 1;
-    });
+    (async () => {
+        try {
+            await runWonderlandEditor(process.argv.slice(2));
+        } catch (err) {
+            console.error('Build failed:', err);
+            process.exit(err?.code ?? 1);
+        }
+    })();
 }
 
 module.exports = {runWonderlandEditor};
