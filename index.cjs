@@ -104,22 +104,14 @@ async function runWonderlandEditor(args) {
     });
 }
 
-// Command-line interface
 if (require.main === module) {
-    // Forward all arguments as-is; Wonderland Editor handles parsing
-    const rawArgs = process.argv.slice(2);
     (async () => {
         try {
-            await runWonderlandEditor(rawArgs);
-            // successful exit
-            // explicitly exit to ensure Node terminates immediately
+            await runWonderlandEditor(process.argv.slice(2));
             process.exit(0);
         } catch (err) {
             console.error('Build failed:', err);
-            // if the error contains a code from the child, use it; otherwise use 1
-            const exitCode = err && err.code ? (Number.isNaN(Number(err.code)) ? 1 : Number(err.code)) : 1;
-            process.exitCode = exitCode;
-            process.exit(exitCode);
+            process.exit(err?.code ?? 1);
         }
     })();
 }
