@@ -108,7 +108,6 @@ if (require.main === module) {
     (async () => {
         try {
             await runWonderlandEditor(process.argv.slice(2));
-            process.exit(0);
         } catch (err) {
             console.error('Build failed:', err);
             process.exit(err?.code ?? 1);
