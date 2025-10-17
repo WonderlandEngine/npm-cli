@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
-const { join } = require('path');
+const {spawn} = require('child_process');
+const {join} = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 const which = require('which');
@@ -32,7 +32,7 @@ const directoriesToSearch = searchPaths[process.platform] ?? ['/'];
  * Tries to find the Wonderland Editor executable.
  */
 async function findExecutable(directories) {
-    const execPath = await which(executableName, { nothrow: true });
+    const execPath = await which(executableName, {nothrow: true});
     if (execPath) {
         return execPath;
     }
@@ -85,7 +85,7 @@ async function findWonderlandEditorPath() {
 async function runWonderlandEditor(args) {
     const editorPath = await findWonderlandEditorPath();
     return new Promise((resolve, reject) => {
-        const child = spawn(editorPath, args, { stdio: 'inherit' });
+        const child = spawn(editorPath, args, {stdio: 'inherit'});
 
         child.on('close', (code) => {
             if (code === 0) {
@@ -116,4 +116,4 @@ if (require.main === module) {
     })();
 }
 
-module.exports = { runWonderlandEditor };
+module.exports = {runWonderlandEditor};
