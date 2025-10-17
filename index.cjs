@@ -117,7 +117,7 @@ if (require.main === module) {
         } catch (err) {
             console.error('Build failed:', err);
             // if the error contains a code from the child, use it; otherwise use 1
-            const exitCode = err && err.code ? Number(err.code) || 1 : 1;
+            const exitCode = err && err.code ? (Number.isNaN(Number(err.code)) ? 1 : Number(err.code)) : 1;
             process.exitCode = exitCode;
             process.exit(exitCode);
         }
