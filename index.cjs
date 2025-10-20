@@ -54,7 +54,12 @@ function isExecutable(path) {
     if (process.platform === 'win32') {
         return path.endsWith('.exe');
     } else {
-        return fs.accessSync(path, fs.constants.X_OK);
+        try {
+            fs.accessSync(path, fs.constants.X_OK);
+            return true;
+        } catch (err) {
+            return false;
+        }
     }
 }
 
