@@ -47,13 +47,32 @@ async function findExecutable(directories) {
 }
 
 /**
+ * Checks if a given path is executable.
+ * @returns {boolean} True if the path is executable, false otherwise.
+ */
+function isExecutable(path) {
+    if (process.platform === 'win32') {
+        return path.endsWith('.exe');
+    } else {
+        try {
+            fs.accessSync(path, fs.constants.X_OK);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+}
+
+/**
  * Function to find the WonderlandEditor path
  * @returns the path to the editor executable
  */
 async function findWonderlandEditorPath() {
     let path = process.env.WONDERLAND_EDITOR_PATH;
     if (path && fs.existsSync(path)) {
-        path = join(path, executableName);
+        if (!isExecutable(path)) {
+            path = join(path, executableName);
+        }
     } else {
         // Search for the executable in common directories and path variables
         path = await findExecutable(directoriesToSearch);
